@@ -19,7 +19,7 @@
 
     <properties>
         <flow.version>2.5.2</flow.version>
-        <!-- <osgi.version>6.0.0</osgi.version> -->
+        <osgi.version>6.0.0</osgi.version>
         <vaadin.version>14.5.2</vaadin.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -61,22 +61,35 @@
     <dependencies>
         <dependency>
             <groupId>com.vaadin</groupId>
-            <artifactId>flow</artifactId>
-            <version>${flow.version}</version>
-            <type>pom</type>
-            <scope>provided</scope>
+            <artifactId>vaadin-core</artifactId>
         </dependency>
+
         <dependency>
             <groupId>com.vaadin</groupId>
-            <artifactId>flow-data</artifactId>
-            <version>${flow.version}</version>
+            <artifactId>flow-osgi</artifactId>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>osgi.cmpn</artifactId>
+            <version>${osgi.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <version>${osgi.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>com.vaadin.componentfactory</groupId>
             <artifactId>enhanced-date-picker</artifactId>
             <version>1.5.0</version>
          </dependency>
+         
          <dependency>
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-date-time-picker-flow</artifactId>
@@ -85,13 +98,7 @@
 
     <build>
         <plugins>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.2.1</version>
-            </plugin>
-            <plugin>
+             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>2.2.1</version>

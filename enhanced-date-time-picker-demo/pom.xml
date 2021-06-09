@@ -16,16 +16,10 @@
         <url>http://vaadin.com/</url>
     </organization>
 
-    <licenses>
-        <license>
-            <name>CVALv3</name>
-            <url>https://vaadin.com/license/cval-3</url>
-        </license>
-    </licenses>
-
     <properties>
         <flow.version>2.5.2</flow.version>
         <vaadin.version>14.5.2</vaadin.version>
+        <osgi.version>6.0.0</osgi.version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <failOnMissingWebXml>false</failOnMissingWebXml>
@@ -46,7 +40,15 @@
     <dependencies>
         <dependency>
             <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-core</artifactId>           
+            <artifactId>flow-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>flow-data</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.vaadin</groupId>
+            <artifactId>flow-html-components</artifactId>
         </dependency>
 
         <!-- Component -->

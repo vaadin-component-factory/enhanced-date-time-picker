@@ -37,7 +37,7 @@ class EnhancedDateTimePickerDatePicker
 
 @Tag("vaadin-date-time-picker-time-picker") 
 class EnhancedDateTimePickerTimePicker
-        extends com.vaadin.flow.component.timepicker.TimePicker {   
+        extends com.vaadin.componentfactory.EnhancedTimePicker {   
             
     @Override
     protected void validate() {
@@ -745,7 +745,7 @@ public class EnhancedDateTimePicker extends AbstractField<EnhancedDateTimePicker
      *
      * @param dateFormattingPattern
      *           the pattern for formatting value of the date picker
-     *           if set to null or empty string then for matting will be done by Locale
+     *           if set to null or empty string then formatting will be done by Locale
      */
     public void setDatePattern(String dateFormattingPattern) {
         this.datePicker.setPattern(dateFormattingPattern);
@@ -777,6 +777,44 @@ public class EnhancedDateTimePicker extends AbstractField<EnhancedDateTimePicker
      */
     public LocalTime getTimeValue() {
         return this.timePicker.getValue();
+    }
+
+    /**
+     * Gets the Pattern for the time picker.
+     *
+     * @return the pattern for formatting value of the time picker
+     */
+    public String getTimePattern() {
+        return this.timePicker.getPattern();
+    }
+
+    /**
+     * Sets the Pattern for formatting the value of the time picker.
+     *
+     * @param timeFormattingPattern
+     *           the pattern for formatting value of the time picker
+     */
+    public void setTimePattern(String timeFormattingPattern) {
+        this.timePicker.setPattern(timeFormattingPattern);
+    }
+
+    /**
+     * Gets the parser patterns for the time picker.
+     *
+     * @return an array of the parser patterns used for formatting value of the time picker
+     */
+    public String[] getTimeParsers() {
+        return this.timePicker.getParsers();
+    }
+
+    /**
+     * Sets the patterns for parsing the value of the time picker.
+     * 
+     * @param timeParsers
+     *           the array of patterns used for parsing the time picker's value
+     */
+    public void setTimeParsers(String[] timeParsers) {
+        this.timePicker.setParsers(timeParsers);
     }
 
 }
