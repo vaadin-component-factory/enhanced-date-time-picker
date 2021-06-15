@@ -215,38 +215,24 @@ public class EnhancedDateTimePicker extends AbstractField<EnhancedDateTimePicker
         this(initialDateTime);
         setLocale(locale);
     }
-
+   
     /**
-     * Convenience Constructor to create a date picker with pre-selected date
-     * and pattern setup.
+     * Convenience Constructor to create a date time picker with pre-selected date time
+     * and patterns setup.
      *
      * @param initialDateTime
-     *            the pre-selected date in the picker
+     *            the pre-selected datetime in the picker
      * @param dateFormattingPattern
      *            the pattern for formatting value of the date picker
+     * @param timeFormattingPattern
+     *            the pattern for formatting value of the time picker
      */
-    public EnhancedDateTimePicker(LocalDateTime initialDateTime, String dateFormattingPattern) {
+    public EnhancedDateTimePicker(LocalDateTime initialDateTime, String dateFormattingPattern, String timeFormattingPattern) {
         this(initialDateTime);
         setDatePattern(dateFormattingPattern);
+        setTimePattern(timeFormattingPattern);
     }
-    
-    /**
-     * Convenience Constructor to create a date picker with pre-selected date, formatting 
-     * pattern, and parsing patterns.
-     *
-     * @param initialDateTime
-     *            the pre-selected date in the picker
-     * @param dateFormattingPattern
-     *            the pattern for formatting value of the date picker
-     * @param dateParserPatterns
-     *           the array of patterns used for parsing the date picker's value
-     */
-    public EnhancedDateTimePicker(LocalDateTime initialDateTime, String dateFormattingPattern, String ... dateParserPatterns) {
-        this(initialDateTime);
-        setDatePattern(dateFormattingPattern);
-        setDateParsers(dateParserPatterns);
-    }
-
+       
     @Override
     public void setValue(LocalDateTime value) {
         super.setValue(value);

@@ -20,6 +20,7 @@ import com.vaadin.flow.function.SerializableConsumer;
 import com.vaadin.flow.function.SerializableFunction;
 import com.vaadin.flow.shared.Registration;
 
+@JavaScript("frontend://date-fns-limited.min.js")
 @JavaScript("frontend://enhancedTimepickerConnector.js")
 public class EnhancedTimePicker extends GeneratedVaadinTimePicker<EnhancedTimePicker, LocalTime>
 implements HasSize, HasValidation {
@@ -329,14 +330,14 @@ implements HasSize, HasValidation {
 
     @Override
     protected void onAttach(AttachEvent attachEvent) {
-        super.onAttach(attachEvent);
-        if (getLocale() == null) {
-            setLocale(attachEvent.getUI().getLocale());
+        super.onAttach(attachEvent);       
+        initConnector(); 
+        if (locale == null) {
+            getUI().ifPresent(ui -> setLocale(ui.getLocale())); 
         }
         if (formattingPattern != null) {
             setPattern(formattingPattern);
-        }
-        initConnector();
+        }               
         EnhancedTimePickerFieldValidationUtil.disableClientValidation(this);
     }
 
@@ -391,7 +392,7 @@ implements HasSize, HasValidation {
         if (!locale.getCountry().isEmpty()) {
             bcp47LanguageTag.append("-").append(locale.getCountry());
         }
-        runBeforeClientResponse(ui -> getElement().callFunction(
+        runBeforeClientResponse(ui -> getElement().callJsFunction(
                 "$connector.setLocale", bcp47LanguageTag.toString()));
     }
 
@@ -443,7 +444,7 @@ implements HasSize, HasValidation {
      */
     public void setPattern(String formattingPattern){
         this.formattingPattern = formattingPattern;
-        runBeforeClientResponse(ui -> getElement().callFunction("$connector.setPattern", formattingPattern));
+        runBeforeClientResponse(ui -> getElement().callJsFunction("$connector.setPattern", formattingPattern));
     }
 
     /**

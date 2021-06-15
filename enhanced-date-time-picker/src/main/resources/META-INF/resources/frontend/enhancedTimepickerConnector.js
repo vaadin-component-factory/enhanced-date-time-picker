@@ -16,6 +16,8 @@
             }
 
             timepicker.$connector = {};
+            timepicker.$connector.pattern;
+            timepicker.$connector.parsers = [];
 
             const getAmPmString = function (locale, testTime) {
                 const testTimeString = testTime.toLocaleTimeString(locale);
@@ -85,20 +87,18 @@
             // detecting milliseconds from input, expects am/pm removed from end, eg. .0 or .00 or .000
             const millisecondRegExp = /[[\.][\d\u0660-\u0669]{1,3}$/;
 
-            timepicker.$connector.setLocale = function (locale) {
+            // format time based on given pattern
+            const formatTimeBasedOnPattern = function (timeToBeFormatted, pattern, language) {
+                return DateFns.format(timeToBeFormatted, pattern, { locale: DateFns.locales[language] });
+            };   
+
+            timepicker.$connector.setLocalePatternAndParsers = function (locale, pattern, parsers) {
+                let language = locale ? locale.split('-')[0] : 'enUS';
+
                 // capture previous value if any
                 let previousValueObject;
                 if (timepicker.value && timepicker.value !== '') {
                     previousValueObject = timepicker.i18n.parseTime(timepicker.value);
-                }
-
-                try {
-                    // Check whether the locale is supported by the browser or not
-                    testPmTime.toLocaleTimeString(locale);
-                } catch (e) {
-                    locale = "en-US";
-                    // FIXME should do a callback for server to throw an exception ?
-                    throw new Error("vaadin-time-picker: The locale " + locale + " is not supported, falling back to default locale setting(en-US).");
                 }
 
                 // 1. 24 or 12 hour clock, if latter then what are the am/pm strings ?
@@ -171,17 +171,46 @@
                 let cachedTimeString;
                 let cachedTimeObject;
 
+                const parseBasedOnParsers = function (timeString, parsersCopy, language) {
+                    var date;
+                    var i;
+                    for (i in parsersCopy) {
+                        try {
+                            date = DateFns.parse(timeString, parsersCopy[i], new Date(), { locale: DateFns.locales[language] });
+                            if (date != 'Invalid Date') {
+                                break;
+                            }
+                        } catch (err) {}
+                    }
+        
+                    cachedTimeObject = {
+                        hours: date.getHours(),
+                        minutes: date.getMinutes(),
+                        seconds: date.getSeconds(),
+                        milliseconds: date.getMilliseconds()
+                    };
+
+                    cachedTimeString = timeString;
+                    return cachedTimeObject;
+                };
+                
                 timepicker.i18n = {
-                    formatTime:function (timeObject) {
+                    formatTime: function (timeObject) {
                         if (timeObject) {
                             let timeToBeFormatted = new Date();
                             timeToBeFormatted.setHours(timeObject.hours);
                             timeToBeFormatted.setMinutes(timeObject.minutes);
                             timeToBeFormatted.setSeconds(timeObject.seconds !== undefined ? timeObject.seconds : 0);
-                            let localeTimeString = timeToBeFormatted.toLocaleTimeString(locale, getTimeFormatOptions());
-                            // milliseconds not part of the time format API
-                            localeTimeString = formatMilliseconds(localeTimeString, timeObject.milliseconds);
-                            return localeTimeString;
+    
+                            if(pattern) {
+                                timeToBeFormatted.setMilliseconds(timeObject.milliseconds !== undefined ? timeObject.milliseconds : 0)
+                                return formatTimeBasedOnPattern(timeToBeFormatted, pattern, language);
+                            } else if(locale) {
+                                let localeTimeString = timeToBeFormatted.toLocaleTimeString(locale, getTimeFormatOptions());
+                                // milliseconds not part of the time format API
+                                localeTimeString = formatMilliseconds(localeTimeString, timeObject.milliseconds);
+                                return localeTimeString;
+                            }
                         }
                     },
                     parseTime: function (timeString) {
@@ -189,6 +218,17 @@
                             return cachedTimeObject;
                         }
                         if (timeString) {
+
+                            // let parsersCopy = JSON.parse(JSON.stringify(parsers));
+
+                            // if (pattern) {
+                            //     parsersCopy.push(pattern);
+                            // }
+    
+                            // if (parsersCopy.length > 0) {
+                            //     return parseBasedOnParsers(timeString, parsersCopy, language);
+                            // }
+
                             const pm = timeString.search(pmString);
                             const am = timeString.search(amString);
                             let numbersOnlyTimeString = timeString.replace(amString, '').replace(pmString, '').trim();
@@ -226,6 +266,7 @@
                                 cachedTimeString = timeString;
                                 return cachedTimeObject;
                             }
+                           
                             // when nothing is returned, the component shows the invalid state for the input
                         }
                     }
@@ -242,6 +283,30 @@
                         }
                     });
                 }
-            }
+            };
+
+            timepicker.$connector.setLocale = function (locale) {
+                try {
+                    // Check whether the locale is supported by the browser or not
+                    testPmTime.toLocaleTimeString(locale);
+                } catch (e) {
+                    locale = "en-US";
+                    // FIXME should do a callback for server to throw an exception ?
+                    throw new Error("vaadin-time-picker: The locale " + locale + " is not supported, falling back to default locale setting(en-US).");
+                }
+                
+                this.locale = locale;
+                this.setLocalePatternAndParsers(this.locale, this.pattern, this.parsers);
+            };
+			
+			timepicker.$connector.setPattern = function (pattern) {
+                this.pattern = pattern;                
+                this.setLocalePatternAndParsers(this.locale, this.pattern, this.parsers);
+            };
+    
+            timepicker.$connector.setParsers = function (...parsers) {
+                this.parsers = parsers;
+                this.setLocalePatternAndParsers(this.locale, this.pattern, this.parsers);
+            };
         }
     };
