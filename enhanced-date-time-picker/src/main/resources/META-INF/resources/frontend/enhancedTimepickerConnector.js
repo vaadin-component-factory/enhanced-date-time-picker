@@ -19,6 +19,8 @@
             timepicker.$connector.pattern;
             timepicker.$connector.parsers = [];
 
+            
+
             const getAmPmString = function (locale, testTime) {
                 const testTimeString = testTime.toLocaleTimeString(locale);
                 // AM/PM string is anything from one letter in eastern arabic to standard two letters,
@@ -183,7 +185,7 @@
                         } catch (err) {}
                     }
         
-                    cachedTimeObject = {
+                    cachedTimeObject = date != 'Invalid Date' && {
                         hours: date.getHours(),
                         minutes: date.getMinutes(),
                         seconds: date.getSeconds(),
@@ -193,7 +195,7 @@
                     cachedTimeString = timeString;
                     return cachedTimeObject;
                 };
-                
+                               
                 timepicker.i18n = {
                     formatTime: function (timeObject) {
                         if (timeObject) {
@@ -205,7 +207,7 @@
                             if(pattern) {
                                 timeToBeFormatted.setMilliseconds(timeObject.milliseconds !== undefined ? timeObject.milliseconds : 0)
                                 return formatTimeBasedOnPattern(timeToBeFormatted, pattern, language);
-                            } else if(locale) {
+                            } else  {
                                 let localeTimeString = timeToBeFormatted.toLocaleTimeString(locale, getTimeFormatOptions());
                                 // milliseconds not part of the time format API
                                 localeTimeString = formatMilliseconds(localeTimeString, timeObject.milliseconds);
@@ -213,21 +215,24 @@
                             }
                         }
                     },
+
                     parseTime: function (timeString) {
                         if (timeString && timeString === cachedTimeString && cachedTimeObject) {
                             return cachedTimeObject;
                         }
                         if (timeString) {
 
-                            // let parsersCopy = JSON.parse(JSON.stringify(parsers));
+                            timeString = timepicker.__dropdownElement.value;
+                                                       
+                            let parsersCopy = JSON.parse(JSON.stringify(parsers));
 
-                            // if (pattern) {
-                            //     parsersCopy.push(pattern);
-                            // }
+                            if (pattern) {
+                                parsersCopy.push(pattern);
+                            }
     
-                            // if (parsersCopy.length > 0) {
-                            //     return parseBasedOnParsers(timeString, parsersCopy, language);
-                            // }
+                            if (parsersCopy.length > 0) {
+                               return parseBasedOnParsers(timeString, parsersCopy, language);
+                            }
 
                             const pm = timeString.search(pmString);
                             const am = timeString.search(amString);
