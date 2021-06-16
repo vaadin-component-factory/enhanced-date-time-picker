@@ -87,7 +87,7 @@ public class EnhancedDateTimePickerDemoView extends DemoView {
         Div message = createMessageDiv("simple-picker-message");
 
         // begin-source-example
-        // source-example-heading: Date time picker with pattern for time only 
+        // source-example-heading: Date time picker with pattern for time only
         EnhancedDateTimePicker dateTimePicker = new EnhancedDateTimePicker(LocalDateTime.now());
         dateTimePicker.setStep(Duration.ofHours(1));
         updateOnlyTimeMessage(message, dateTimePicker);
@@ -109,7 +109,6 @@ public class EnhancedDateTimePickerDemoView extends DemoView {
             patterns.setValue(null);
             updateOnlyTimeMessage(message, dateTimePicker);
         });
-
         // end-source-example
 
         dateTimePicker.setId("time-pattern-picker");
@@ -121,7 +120,7 @@ public class EnhancedDateTimePickerDemoView extends DemoView {
         Div message = createMessageDiv("simple-picker-message");
 
         // begin-source-example
-        // source-example-heading: Date time picker with pattern & parsers for time only 
+        // source-example-heading: Date time picker with pattern and parsers for time only
         EnhancedDateTimePicker dateTimePicker = new EnhancedDateTimePicker(LocalDateTime.now());
         dateTimePicker.setTimePattern("hh.mm");        
         updateOnlyTimeMessage(message, dateTimePicker);
@@ -142,12 +141,11 @@ public class EnhancedDateTimePickerDemoView extends DemoView {
             dateTimePicker.setTimeParsers(parsingPatternOne.getValue(), parsingPatternTwo.getValue());
             updateOnlyTimeMessage(message, dateTimePicker);
         });
-
         // end-source-example
 
-        dateTimePicker.setId("time-pattern-picker");
+        dateTimePicker.setId("time-parsers-picker");
 
-        addCard("Date time picker with pattern for time only", dateTimePicker, message, parsingPatternOne, parsingPatternTwo, setParsingPatternBtn);
+        addCard("Date time picker with pattern and parsers for time only", dateTimePicker, message, parsingPatternOne, parsingPatternTwo, setParsingPatternBtn);
     }
 
     private void createOnlyDatePatternDateTimePicker() {
@@ -175,7 +173,6 @@ public class EnhancedDateTimePickerDemoView extends DemoView {
             patterns.setValue(null);
             updateOnlyDateMessage(message, dateTimePicker);
         });
-
         // end-source-example
 
         dateTimePicker.setId("date-pattern-picker");
@@ -209,8 +206,6 @@ public class EnhancedDateTimePickerDemoView extends DemoView {
         });
 
         locales.setValue(UI.getCurrent().getLocale());
-
-
         // end-source-example
 
         dateTimePicker.setId("simple-locale-picker");
