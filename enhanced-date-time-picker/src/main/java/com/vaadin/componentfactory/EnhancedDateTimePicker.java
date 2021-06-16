@@ -799,7 +799,7 @@ public class EnhancedDateTimePicker extends AbstractField<EnhancedDateTimePicker
      * @param timeParsers
      *           the array of patterns used for parsing the time picker's value
      */
-    public void setTimeParsers(String[] timeParsers) {
+    public void setTimeParsers(String... timeParsers) {
         this.timePicker.setParsers(timeParsers);
     }
 
