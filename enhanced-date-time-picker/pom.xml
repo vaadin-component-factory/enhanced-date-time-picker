@@ -4,13 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.vaadin.componentfactory</groupId>
+    <groupId>org.vaadin.addons.componentfactory</groupId>
     <artifactId>enhanced-date-time-picker</artifactId>
     <packaging>jar</packaging>
 
     <name>EnhancedDateTimePicker</name>
 
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <inceptionYear>2021</inceptionYear>
     <organization>
         <name>Vaadin Ltd</name>
