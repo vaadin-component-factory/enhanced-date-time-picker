@@ -66,6 +66,11 @@ add the following dependency to your `pom.xml`:
 ## Flow documentation
 Documentation for flow can be found in [Flow documentation](https://github.com/vaadin/flow-and-components-documentation/blob/master/documentation/Overview.asciidoc).
 
+## Branches
+
+- vaadin14 is the latest development version for Vaadin 14. Deployed as version 1.x.x
+- vaadin20 is the latest development version for Vaadin 20. Deployed as version 2.x.x
+
 ## License
 
 Apache Licence 2
