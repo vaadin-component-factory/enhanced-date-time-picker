@@ -8,23 +8,21 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import com.vaadin.componentfactory.EnhancedDateTimePicker;
-import com.vaadin.componentfactory.EnhancedTimePicker;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H4;
-import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.demo.DemoView;
 import com.vaadin.flow.router.Route;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 
 
 /**
@@ -189,8 +187,8 @@ public class EnhancedDateTimePickerDemoView extends DemoView {
         // source-example-heading: Simple date time picker with locale selection
         EnhancedDateTimePicker dateTimePicker = new EnhancedDateTimePicker(LocalDateTime.now());
 
-        Stream<Locale> availableLocales = LOCALE_LIST.stream()
-                .sorted(Comparator.comparing(Locale::getDisplayName));
+        List<Locale> availableLocales = LOCALE_LIST.stream()
+                .sorted(Comparator.comparing(Locale::getDisplayName)).collect(Collectors.toList());
         ComboBox<Locale> locales = new ComboBox<>("Select a locale");
         locales.setItemLabelGenerator(Locale::getDisplayName);
         locales.setWidth("300px");
@@ -253,18 +251,26 @@ public class EnhancedDateTimePickerDemoView extends DemoView {
 
         String datePart = StringUtils.EMPTY;
         if(checkDate){
-            datePart = "\nDay: " + selectedDate.getDayOfMonth()
-                     + "\nMonth: " + selectedDate.getMonthValue()
-                     + "\nYear: " + selectedDate.getYear()
+        	String day = selectedDate == null ? StringUtils.EMPTY : String.valueOf(selectedDate.getDayOfMonth());
+        	String month = selectedDate == null ? StringUtils.EMPTY : String.valueOf(selectedDate.getMonthValue());
+        	String year = selectedDate == null ? StringUtils.EMPTY : String.valueOf(selectedDate.getYear());
+        	
+            datePart = "\nDay: " + day
+                     + "\nMonth: " + month
+                     + "\nYear: " + year
                      + formattingDatePattern 
                      + dateParsers;
         }
 
         String timePart = StringUtils.EMPTY;
         if(checkTime){
-            timePart = "\nHour: " + selectedTime.getHour()
-                     + "\nMinutes: " + selectedTime.getMinute()
-                     + "\nSeconds: " + selectedTime.getSecond()
+        	String hour = selectedTime == null ? StringUtils.EMPTY : String.valueOf(selectedTime.getHour());
+        	String minute = selectedTime == null ? StringUtils.EMPTY : String.valueOf(selectedTime.getMinute());
+        	String seconds = selectedTime == null ?  StringUtils.EMPTY : String.valueOf(selectedTime.getSecond());
+        	
+            timePart = "\nHour: " + hour
+                     + "\nMinutes: " + minute
+                     + "\nSeconds: " + seconds
                      + formattingTimePattern
                      + timeParsers;
         }

@@ -30,6 +30,8 @@ import java.util.stream.Stream;
 
 import com.vaadin.flow.component.AttachEvent;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.HasEnabled;
+import com.vaadin.flow.component.HasHelper;
 import com.vaadin.flow.component.HasSize;
 import com.vaadin.flow.component.HasValidation;
 import com.vaadin.flow.component.HasValue;
@@ -40,10 +42,10 @@ import com.vaadin.flow.function.SerializableConsumer;
 import com.vaadin.flow.function.SerializableFunction;
 import com.vaadin.flow.shared.Registration;
 
-@JavaScript("frontend://date-fns-limited.min.js")
-@JavaScript("frontend://enhancedTimepickerConnector.js")
+@JavaScript("./date-fns-limited.min.js")
+@JavaScript("./enhancedTimepickerConnector.js")
 public class EnhancedTimePicker extends GeneratedVaadinTimePicker<EnhancedTimePicker, LocalTime>
-implements HasSize, HasValidation {
+implements HasSize, HasValidation, HasEnabled, HasHelper {
 
     private static final SerializableFunction<String, LocalTime> PARSER = valueFromClient -> {
         return valueFromClient == null || valueFromClient.isEmpty() ? null
