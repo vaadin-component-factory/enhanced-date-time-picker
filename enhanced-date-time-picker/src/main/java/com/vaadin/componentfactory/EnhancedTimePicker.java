@@ -1,5 +1,21 @@
 package com.vaadin.componentfactory;
 
+import com.vaadin.flow.component.AttachEvent;
+import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.HasEnabled;
+import com.vaadin.flow.component.HasHelper;
+import com.vaadin.flow.component.HasSize;
+import com.vaadin.flow.component.HasValidation;
+import com.vaadin.flow.component.HasValue;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.dependency.JavaScript;
+import com.vaadin.flow.component.timepicker.GeneratedVaadinTimePicker;
+import com.vaadin.flow.component.timepicker.StepsUtil;
+import com.vaadin.flow.function.SerializableConsumer;
+import com.vaadin.flow.function.SerializableFunction;
+import com.vaadin.flow.internal.StateTree;
+import com.vaadin.flow.shared.Registration;
+
 /*-
  * #%L
  * EnhancedDateTimePicker
@@ -22,31 +38,15 @@ package com.vaadin.componentfactory;
 
 import java.time.Duration;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import com.vaadin.flow.component.AttachEvent;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.HasEnabled;
-import com.vaadin.flow.component.HasHelper;
-import com.vaadin.flow.component.HasSize;
-import com.vaadin.flow.component.HasValidation;
-import com.vaadin.flow.component.HasValue;
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.component.dependency.JavaScript;
-import com.vaadin.flow.component.timepicker.GeneratedVaadinTimePicker;
-import com.vaadin.flow.component.timepicker.StepsUtil;
-import com.vaadin.flow.function.SerializableConsumer;
-import com.vaadin.flow.function.SerializableFunction;
-import com.vaadin.flow.shared.Registration;
-
 @JavaScript("./date-fns-limited.min.js")
 @JavaScript("./enhancedTimepickerConnector.js")
 public class EnhancedTimePicker extends GeneratedVaadinTimePicker<EnhancedTimePicker, LocalTime>
-implements HasSize, HasValidation, HasEnabled, HasHelper {
+    implements HasSize, HasValidation, HasEnabled, HasHelper {
 
     private static final SerializableFunction<String, LocalTime> PARSER = valueFromClient -> {
         return valueFromClient == null || valueFromClient.isEmpty() ? null
@@ -60,11 +60,11 @@ implements HasSize, HasValidation, HasEnabled, HasHelper {
     private static final String PROP_AUTO_OPEN_DISABLED = "autoOpenDisabled";
 
     private Locale locale;
-    private transient DateTimeFormatter dateTimeFormatter;
 
     private LocalTime max;
     private LocalTime min;
     private boolean required;
+    private StateTree.ExecutionRegistration pendingLocaleUpdate;
 
     private String formattingPattern;
     private String[] parserPatterns;
@@ -73,7 +73,7 @@ implements HasSize, HasValidation, HasEnabled, HasHelper {
      * Default constructor.
      */
     public EnhancedTimePicker() {
-        this((LocalTime) null);
+        this((LocalTime) null, true);
     }
 
     /**
@@ -83,7 +83,23 @@ implements HasSize, HasValidation, HasEnabled, HasHelper {
      *            the pre-selected time in the picker
      */
     public EnhancedTimePicker(LocalTime time) {
-        super(time, null, String.class, PARSER, FORMATTER);
+        this(time, false);
+    }
+    
+    /**
+     * Convenience constructor to create a time picker with a pre-selected time.
+     *
+     * @param time
+     *            the pre-selected time in the picker
+     * @param isInitialValueOptional
+     *            If {@code isInitialValueOptional} is {@code true} then the
+     *            initial value is used only if element has no {@code "value"}
+     *            property value, otherwise element {@code "value"} property is
+     *            ignored and the initial value is set
+     */
+    public EnhancedTimePicker(LocalTime time, boolean isInitialValueOptional) {
+        super(time, null, String.class, PARSER, FORMATTER,
+          isInitialValueOptional);
 
         // workaround for https://github.com/vaadin/flow/issues/3496
         setInvalid(false);
@@ -352,9 +368,7 @@ implements HasSize, HasValidation, HasEnabled, HasHelper {
     protected void onAttach(AttachEvent attachEvent) {
         super.onAttach(attachEvent);       
         initConnector(); 
-        if (locale == null) {
-            getUI().ifPresent(ui -> setLocale(ui.getLocale())); 
-        }
+        requestLocaleUpdate();
         if (formattingPattern != null) {
             setPattern(formattingPattern);
         }               
@@ -364,7 +378,7 @@ implements HasSize, HasValidation, HasEnabled, HasHelper {
     private void initConnector() {
         // can't run this with getElement().executeJavaScript(...) since then
         // setLocale might be called before this causing client side error
-        runBeforeClientResponse(ui -> ui.getPage().executeJavaScript(
+        runBeforeClientResponse(ui -> ui.getPage().executeJs(
                 "window.Vaadin.Flow.enhancedTimepickerConnector.initLazy($0)",
                 getElement()));
     }
@@ -403,17 +417,7 @@ implements HasSize, HasValidation, HasEnabled, HasHelper {
         }
 
         this.locale = locale;
-        this.dateTimeFormatter = null;
-        // we could support script & variant, but that requires more work on
-        // client side to detect the different
-        // number characters for other scripts (current only Arabic there)
-        StringBuilder bcp47LanguageTag = new StringBuilder(
-                locale.getLanguage());
-        if (!locale.getCountry().isEmpty()) {
-            bcp47LanguageTag.append("-").append(locale.getCountry());
-        }
-        runBeforeClientResponse(ui -> getElement().callJsFunction(
-                "$connector.setLocale", bcp47LanguageTag.toString()));
+        requestLocaleUpdate();
     }
 
     /**
@@ -427,10 +431,40 @@ implements HasSize, HasValidation, HasEnabled, HasHelper {
      */
     @Override
     public Locale getLocale() {
+      if (locale != null) {
         return locale;
+      } else {
+          return super.getLocale();
+      }
+    }
+      
+    private void requestLocaleUpdate() {
+      getUI().ifPresent(ui -> {
+          if (pendingLocaleUpdate != null) {
+              pendingLocaleUpdate.remove();
+          }
+          pendingLocaleUpdate = ui.beforeClientResponse(this, context -> {
+              pendingLocaleUpdate = null;
+              executeLocaleUpdate();
+          });
+      });
     }
 
-/**
+    private void executeLocaleUpdate() {
+        Locale appliedLocale = getLocale();
+        // we could support script & variant, but that requires more work on
+        // client side to detect the different
+        // number characters for other scripts (current only Arabic there)
+        StringBuilder bcp47LanguageTag = new StringBuilder(
+                appliedLocale.getLanguage());
+        if (!appliedLocale.getCountry().isEmpty()) {
+            bcp47LanguageTag.append("-").append(appliedLocale.getCountry());
+        }
+        runBeforeClientResponse(ui -> getElement().callJsFunction(
+                "$connector.setLocale", bcp47LanguageTag.toString()));
+    }
+
+    /**
      * Setting the patterns for parsing the value of the date-picker.
      * 
      * The parsing will be attempted according to the order of the supplied patterns. If none of these
@@ -443,7 +477,7 @@ implements HasSize, HasValidation, HasEnabled, HasHelper {
      */
     public void setParsers(String... parserPatterns){
     	this.parserPatterns = parserPatterns;
-        runBeforeClientResponse(ui -> getElement().callFunction("$connector.setParsers", parserPatterns));
+        runBeforeClientResponse(ui -> getElement().callJsFunction("$connector.setParsers", parserPatterns));
     }
     
     /**
@@ -481,44 +515,28 @@ implements HasSize, HasValidation, HasEnabled, HasHelper {
      * Sets the minimum time in the time picker. Times before that will be
      * disabled in the popup.
      *
-     * @deprecated use {@link #setMinTime(LocalTime)} instead.
-     *
      * @param min
      *            the minimum time that is allowed to be selected, or
      *            <code>null</code> to remove any minimum constraints
      */
-    @Override
-    @Deprecated
-    public void setMin(String min) {
-        this.min = parse(min, initializeAndReturnFormatter());
-        super.setMin(min);
+    public void setMin(LocalTime min) {
+        this.min = min;
+        super.setMin(format(min));
     }
 
     /**
      * Sets the minimum time in the time picker. Times before that will be
      * disabled in the popup.
      *
+     * @deprecated Since 22.0, this API is deprecated in favor of
+     *             {@link EnhancedTimePicker#setMin(LocalTime)}
      * @param min
      *            the minimum time that is allowed to be selected, or
      *            <code>null</code> to remove any minimum constraints
      */
-    public void setMinTime(LocalTime min) {
-        this.min = min;
-        super.setMin(format(min));
-    }
-
-    /**
-     * Gets the minimum time in the time picker. Time before that will be
-     * disabled in the popup.
-     *
-     * @deprecated use {@link #getMinTime()} instead.
-     *
-     * @return the minimum time that is allowed to be selected, or
-     *         <code>null</code> if there's no minimum
-     */
     @Deprecated
-    public String getMin() {
-        return super.getMinString();
+    public void setMinTime(LocalTime min) {
+        this.setMin(min);
     }
 
     /**
@@ -528,27 +546,25 @@ implements HasSize, HasValidation, HasEnabled, HasHelper {
      * @return the minimum time that is allowed to be selected, or
      *         <code>null</code> if there's no minimum
      */
-    public LocalTime getMinTime() {
+    public LocalTime getMin() {
         return this.min;
     }
 
     /**
-     * Sets the maximum time in the time picker. Times after that will be
+     * Gets the minimum time in the time picker. Time before that will be
      * disabled in the popup.
      *
-     * @deprecated use {@link #setMaxTime(LocalTime)} instead.
+     * @deprecated Since 22.0, this API is deprecated in favor of
+     *             {@link EnhancedTimePicker#getMin()}
      *
-     * @param max
-     *            the maximum time that is allowed to be selected, or
-     *            <code>null</code> to remove any maximum constraints
+     * @return the minimum time that is allowed to be selected, or
+     *         <code>null</code> if there's no minimum
      */
-    @Override
     @Deprecated
-    public void setMax(String max) {
-        this.max = parse(max, initializeAndReturnFormatter());
-        super.setMax(max);
+    public LocalTime getMinTime() {
+        return this.getMin();
     }
-
+    
     /**
      * Sets the maximum time in the time picker. Times after that will be
      * disabled in the popup.
@@ -557,23 +573,25 @@ implements HasSize, HasValidation, HasEnabled, HasHelper {
      *            the maximum time that is allowed to be selected, or
      *            <code>null</code> to remove any maximum constraints
      */
-    public void setMaxTime(LocalTime max) {
+    public void setMax(LocalTime max) {
         this.max = max;
         super.setMax(format(max));
     }
 
     /**
-     * Gets the maximum time in the time picker. Times after that will be
+     * Sets the maximum time in the time picker. Times after that will be
      * disabled in the popup.
      *
-     * @deprecated use {@link #getMaxTime()} instead.
+     * @deprecated Since 22.0, this API is deprecated in favor of
+     *             {@link EnhancedTimePicker#setMax(LocalTime)}
      *
-     * @return the maximum time that is allowed to be selected, or
-     *         <code>null</code> if there's no maximum
+     * @param max
+     *            the maximum time that is allowed to be selected, or
+     *            <code>null</code> to remove any maximum constraints
      */
     @Deprecated
-    public String getMax() {
-        return super.getMaxString();
+    public void setMaxTime(LocalTime max) {
+        this.setMax(max);
     }
 
     /**
@@ -583,8 +601,23 @@ implements HasSize, HasValidation, HasEnabled, HasHelper {
      * @return the maximum time that is allowed to be selected, or
      *         <code>null</code> if there's no maximum
      */
-    public LocalTime getMaxTime() {
+    public LocalTime getMax() {
         return this.max;
+    }
+
+    /**
+     * Gets the maximum time in the time picker. Times after that will be
+     * disabled in the popup.
+     *
+     * @deprecated Since 22.0, this API is deprecated in favor of
+     *             {@link EnhancedTimePicker#getMax()}
+     *
+     * @return the maximum time that is allowed to be selected, or
+     *         <code>null</code> if there's no maximum
+     */
+    @Deprecated
+    public LocalTime getMaxTime() {
+        return this.getMax();
     }
 
     /**
@@ -659,21 +692,8 @@ implements HasSize, HasValidation, HasEnabled, HasHelper {
                 .filter(locale -> !locale.getLanguage().isEmpty());
     }
 
-    private DateTimeFormatter initializeAndReturnFormatter() {
-        if(dateTimeFormatter == null) {
-            dateTimeFormatter = locale == null ?
-                DateTimeFormatter.ISO_LOCAL_TIME :
-                DateTimeFormatter.ISO_LOCAL_TIME.withLocale(locale);
-        }
-        return dateTimeFormatter;
-    }
-
     private static String format(LocalTime time) {
         return time != null ? time.toString() : null;
-    }
-
-    private static LocalTime parse(String time, DateTimeFormatter formatter) {
-        return time != null ? LocalTime.parse(time, formatter) : null;
     }
 
 }
