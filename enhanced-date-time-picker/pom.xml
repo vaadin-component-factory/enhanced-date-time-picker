@@ -10,7 +10,7 @@
 
     <name>EnhancedDateTimePicker</name>
 
-    <version>2.0.4</version>
+    <version>3.0.0</version>
     <inceptionYear>2021</inceptionYear>
     <organization>
         <name>Vaadin Ltd</name>
@@ -18,10 +18,10 @@
     </organization>
 
     <properties>
-        <flow.version>23.0.1</flow.version>
-        <vaadin.version>23.0.1</vaadin.version>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <flow.version>24.3.3</flow.version>
+        <vaadin.version>24.3.3</vaadin.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
 		<repositories>
@@ -62,17 +62,6 @@
             <groupId>com.vaadin</groupId>
             <artifactId>vaadin-core</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>com.vaadin.componentfactory</groupId>
-            <artifactId>enhanced-date-picker</artifactId>
-            <version>2.0.0</version>
-         </dependency>
-         
-         <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>vaadin-date-time-picker-flow</artifactId>
-        </dependency>		
     </dependencies>
 
     <build>
@@ -80,7 +69,7 @@
              <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>

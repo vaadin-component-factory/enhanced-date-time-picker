@@ -15,11 +15,14 @@ error-screenshots/
 package*.json
 webpack.config.js
 node_modules/
-enhanced-date-time-picker-demo/frontend/generated/vaadin.ts
+enhanced-date-time-picker-demo/frontend/index.html
+enhanced-date-time-picker-demo/frontend/generated
 enhanced-date-time-picker-demo/webpack.generated.js
 enhanced-date-time-picker-demo/types.d.ts
 enhanced-date-time-picker-demo/tsconfig.json
 enhanced-date-time-picker-demo/pnpmfile.js
 enhanced-date-time-picker-demo/pnpm-lock.yaml
+enhanced-date-time-picker-demo/vite.config.ts
+enhanced-date-time-picker-demo/vite.generated.ts
 enhanced-date-time-picker-demo/.npmrc
 .vscode/settings.json

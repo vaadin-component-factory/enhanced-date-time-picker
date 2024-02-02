@@ -9,7 +9,7 @@
     <packaging>war</packaging>
     <name>EnhancedDateTimePicker Demo</name>
 
-    <version>2.0.4</version>
+    <version>3.0.0</version>
     <inceptionYear>2021</inceptionYear>
     <organization>
         <name>Vaadin Ltd</name>
@@ -17,10 +17,10 @@
     </organization>
 
     <properties>
-        <flow.version>23.0.1</flow.version>
-        <vaadin.version>23.0.1</vaadin.version>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <flow.version>24.3.3</flow.version>
+        <vaadin.version>24.3.3</vaadin.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <failOnMissingWebXml>false</failOnMissingWebXml>
     </properties>
 
@@ -36,18 +36,41 @@
         </dependencies>
     </dependencyManagement>
 
+	<repositories>
+        <repository>
+            <id>Vaadin Directory</id>
+            <url>https://maven.vaadin.com/vaadin-addons</url>
+        </repository>
+        <!-- Repository needed for prerelease versions of Vaadin -->
+        <repository>
+            <id>Vaadin prereleases</id>
+            <url>https://maven.vaadin.com/vaadin-prereleases</url>
+        </repository>
+        <!-- Repository needed for the snapshot versions of Vaadin -->
+        <repository>
+            <id>vaadin-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <!-- Repository needed for prerelease versions of Vaadin -->
+        <pluginRepository>
+            <id>Vaadin prereleases</id>
+            <url>https://maven.vaadin.com/vaadin-prereleases</url>
+        </pluginRepository>
+        <pluginRepository>
+            <id>vaadin-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/vaadin-snapshots/</url>
+            <releases><enabled>false</enabled></releases>
+        </pluginRepository>
+    </pluginRepositories>
+
     <dependencies>
-        <dependency>
+ 		<dependency>
             <groupId>com.vaadin</groupId>
-            <artifactId>flow-client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>flow-data</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.vaadin</groupId>
-            <artifactId>flow-html-components</artifactId>
+            <!-- Replace artifactId with vaadin-core to use only free components -->
+            <artifactId>vaadin-core</artifactId>            
         </dependency>
 
         <!-- Component -->
@@ -69,7 +92,14 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.25</version>
-        </dependency>		
+        </dependency>	
+        
+        <dependency>
+		    <groupId>jakarta.servlet</groupId>
+		    <artifactId>jakarta.servlet-api</artifactId>
+		    <version>6.0.0</version>
+		    <scope>provided</scope>
+		</dependency>	
 
     </dependencies>
 
@@ -88,7 +118,7 @@
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.4.36.v20210114</version>
+                <version>11.0.12</version>
                 <configuration>
                     <scanIntervalSeconds>1</scanIntervalSeconds>
                 </configuration>
