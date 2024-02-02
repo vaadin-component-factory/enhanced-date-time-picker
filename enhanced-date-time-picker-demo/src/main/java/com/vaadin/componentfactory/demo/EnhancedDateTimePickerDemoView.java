@@ -9,7 +9,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -18,6 +17,7 @@ import com.vaadin.componentfactory.EnhancedDateTimePicker;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker.DatePickerI18n;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.textfield.TextField;
@@ -67,10 +67,11 @@ public class EnhancedDateTimePickerDemoView extends DemoView {
         // begin-source-example
         // source-example-heading: Simple date time picker with patterns for date & time
         EnhancedDateTimePicker dateTimePicker = new EnhancedDateTimePicker(LocalDateTime.now());
-        dateTimePicker.setDatePattern("dd-MM-yyyy");
         dateTimePicker.setTimePattern("HH.mm.ss");
-        dateTimePicker.setDateParsers("dd-MM-yyyy", "dd.MM.yy");
         dateTimePicker.setTimeParsers("HH.mm.ss", "HH:mm");
+        DatePickerI18n datePickerI18n = new DatePickerI18n();
+        datePickerI18n.setDateFormats("dd-MM-yyyy", "dd.MM.yy");
+        dateTimePicker.setDatePickerI18n(datePickerI18n);        
 
         dateTimePicker.addValueChangeListener(
                 event -> updateDateTimeMessage(message, dateTimePicker));
@@ -152,7 +153,10 @@ public class EnhancedDateTimePickerDemoView extends DemoView {
         // begin-source-example
         // source-example-heading: Date time picker with pattern for date only
         EnhancedDateTimePicker dateTimePicker = new EnhancedDateTimePicker(LocalDateTime.now());
-        dateTimePicker.setDatePattern("dd-MMM-yyyy");
+        DatePickerI18n datePickerI18n = new DatePickerI18n();
+        datePickerI18n.setDateFormat("dd-MMM-yyyy");
+        dateTimePicker.setDatePickerI18n(datePickerI18n);
+        
         updateOnlyDateMessage(message, dateTimePicker);
 
         dateTimePicker.addValueChangeListener(
@@ -162,7 +166,8 @@ public class EnhancedDateTimePickerDemoView extends DemoView {
         patterns.setLabel("Select a pattern for date");
         patterns.setItems(DATE_FORMATS);
         patterns.addValueChangeListener(e -> {
-            dateTimePicker.setDatePattern(e.getValue());
+          datePickerI18n.setDateFormat(e.getValue());
+          dateTimePicker.setDatePickerI18n(datePickerI18n);
             updateOnlyDateMessage(message, dateTimePicker);
         });
 
@@ -175,9 +180,7 @@ public class EnhancedDateTimePickerDemoView extends DemoView {
 
         dateTimePicker.setId("date-pattern-picker");
 
-        H4 note = new H4("Note: Date picker implements Enhanced Date Picker component.");
-
-        addCard("Date time picker with pattern for date only", dateTimePicker, message, patterns, dropPatternBtn, note);
+        addCard("Date time picker with pattern for date only", dateTimePicker, message, patterns, dropPatternBtn);
     }
     
     private void createLocaleDateTimePicker() {
@@ -243,10 +246,10 @@ public class EnhancedDateTimePickerDemoView extends DemoView {
     private String createMessage(LocalDate selectedDate, LocalTime selectedTime, boolean checkDate, boolean checkTime, EnhancedDateTimePicker dateTimePicker){
         String localePart = "Locale: " + dateTimePicker.getLocale();
         
-        String dateParsers = ArrayUtils.isEmpty(dateTimePicker.getDateParsers()) ? StringUtils.EMPTY : "\nParsing date pattern: " + Arrays.toString(dateTimePicker.getDateParsers());
+        String dateParsers = ArrayUtils.isEmpty(dateTimePicker.getDateFormats()) ? StringUtils.EMPTY : "\nParsing date pattern: " + Arrays.toString(dateTimePicker.getDateFormats());
         String timeParsers = ArrayUtils.isEmpty(dateTimePicker.getTimeParsers()) ? StringUtils.EMPTY : "\nParsing time pattern: " + Arrays.toString(dateTimePicker.getTimeParsers());
                
-        String formattingDatePattern = StringUtils.isNotBlank(dateTimePicker.getDatePattern()) ? "\nFormatting date pattern: " + dateTimePicker.getDatePattern() : StringUtils.EMPTY;
+        String formattingDatePattern = StringUtils.isNotBlank(dateTimePicker.getDateFormat()) ? "\nFormatting date pattern: " + dateTimePicker.getDateFormat() : StringUtils.EMPTY;
         String formattingTimePattern = StringUtils.isNotBlank(dateTimePicker.getTimePattern()) ? "\nFormatting time pattern: " + dateTimePicker.getTimePattern() : StringUtils.EMPTY;
 
         String datePart = StringUtils.EMPTY;

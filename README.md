@@ -10,29 +10,61 @@ that adds an API for setting formatting and parsing patterns.
 As in EnhancedDatePicker, the formatting for the time part is done by JavaScript library [date-fns v2.0.0-beta.2](https://date-fns.org/v2.0.0-beta.2/docs/Getting-Started). More information about supported formatting paterns can be found here:
 https://date-fns.org/v2.0.0-beta.2/docs/format
 
-This component is part of Vaadin Component Factory.
+## Vaadin 24 support :exclamation::exclamation: 
+
+Since version 3.0.0, the component includes support for Vaadin 24.
+
+The new version no longer depends on EnhancedDatePicker for the Date part. It now uses the standard Vaadin [DatePicker](https://vaadin.com/docs/latest/components/date-picker) component.
+  
+<br/> This component is part of Vaadin Component Factory.
 
 ## How to use EnhancedDateTimePicker
 
-Formatting patterns can be set using methods: 
+##### Formatting patterns can be set using methods: 
 
-- `setDatePattern(String dateFormattingPattern)` for date part 
-- `setTimePattern(String timeFormattingPattern)` for time part
+- Date part 
+	`setDatePattern(String dateFormattingPattern)`  
+- Time part 
+	`setTimePattern(String timeFormattingPattern)` 
 
-or by using constructor:
+Since version 3.0.0:
+
+- Date part
+	```
+	DatePickerI18n datePickerI18n = new DatePickerI18n();
+	datePickerI18n.setDateFormat("dd-MMM-yyyy");
+	dateTimePicker.setDatePickerI18n(datePickerI18n);
+	```  
+- Time part 
+	`setTimePattern(String timeFormattingPattern)`
+
+##### or by using constructor:
 
 `EnhancedDateTimePicker(LocalDateTime initialDateTime, String dateFormattingPattern, String timeFormattingPattern)`
 
-Patterns used for parsing user's input can be set using methods 
+##### Patterns used for parsing user's input can be set using methods 
 
-- `setDateParsers(String ... dateParsers)` for date part
-- `setTimeParsers(String ... timeParsers)` for time part
+- Date part
+	`setDateParsers(String ... dateParsers)` 
+- Time part
+	`setTimeParsers(String ... timeParsers)` 
 
-Also, locale can be set for the whole component using method: 
+Since version 3.0.0:
+
+- Date part
+	```
+	DatePickerI18n datePickerI18n = new DatePickerI18n();
+	datePickerI18n.setDateFormats("dd-MMM-yyyy", "dd.MM.yy");
+	dateTimePicker.setDatePickerI18n(datePickerI18n);
+	```  
+- Time part 
+	`setTimeParsers(String ... timeParsers)`
+
+##### Also, locale can be set for the whole component using method: 
 
 `setLocale(Locale locale)` 
 
-Here's a simple example: 
+##### Here's a simple example: 
 
 ```java
 EnhancedDateTimePicker dateTimePicker = new EnhancedDateTimePicker(LocalDateTime.now());
@@ -41,6 +73,18 @@ dateTimePicker.setTimePattern("HH.mm.ss");
 dateTimePicker.setDateParsers("dd-MM-yyyy", "dd.MM.yy");
 dateTimePicker.setTimeParsers("HH.mm.ss", "HH:mm");
 ```
+
+:exclamation: Since version 3.0.0 
+```java
+EnhancedDateTimePicker dateTimePicker = new EnhancedDateTimePicker(LocalDateTime.now());
+dateTimePicker.setTimePattern("HH.mm.ss");
+dateTimePicker.setTimeParsers("HH.mm.ss", "HH:mm");
+DatePickerI18n datePickerI18n = new DatePickerI18n();
+datePickerI18n.setDateFormats("dd-MM-yyyy", "dd.MM.yy");
+dateTimePicker.setDatePickerI18n(datePickerI18n);
+```
+
+For more examples see [demo](https://github.com/vaadin-component-factory/enhanced-date-time-picker/blob/master/enhanced-date-time-picker-demo/src/main/java/com/vaadin/componentfactory/demo/EnhancedDateTimePickerDemoView.java).
 
 ## Running the component demo
 Run from the command line:
@@ -63,13 +107,13 @@ add the following dependency to your `pom.xml`:
 </dependency>
 ```
 
-## Flow documentation
-Documentation for flow can be found in [Flow documentation](https://github.com/vaadin/flow-and-components-documentation/blob/master/documentation/Overview.asciidoc).
+## Compatibility
 
-## Branches
-
-- vaadin14 is the latest development version for Vaadin 14. Deployed as version 1.x.x
-- vaadin20 is the latest development version for Vaadin 20. Deployed as version 2.x.x
+- Version 1.x.x supports Vaadin 14+
+- Version 2.0.1 supports Vaadin 20
+- Version 2.0.2-3 supports Vaadin 21+
+- Version 2.0.4 supports Vaadin 23
+- Version 3.x.x supports Vaadin 24
 
 ## License
 
